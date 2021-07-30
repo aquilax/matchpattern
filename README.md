@@ -1,2 +1,3 @@
 # matchpattern
-Match Pattern go library
+
+[Match Pattern](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns) go library

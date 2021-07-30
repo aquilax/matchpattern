@@ -1,11 +1,13 @@
 package matchpattern
 
 import (
+	"fmt"
 	"net/url"
 )
 
 const (
-	allURLs = "<all_urls>"
+	allURLPattern = "<all_urls>"
+	allPattern    = "*://*/*"
 )
 
 type matcherType int
@@ -13,10 +15,12 @@ type matcherFunc func(url *url.URL) (bool, error)
 
 const (
 	allURL matcherType = iota
+	pattern
 )
 
-func GetDefaultProtocols() []string {
-	return []string{"http", "https"}
+type MatchSet struct {
+	allUrlSchemes  []string
+	allowedSchemes []string
 }
 
 type matcher struct {
@@ -29,8 +33,8 @@ type MatchPattern struct {
 	matchers []matcher
 }
 
-func NewMatchPattern(patterns []string, schemes []string) (*MatchPattern, error) {
-	matchers, err := getMatchers(patterns, schemes)
+func NewMatchPattern(patterns []string, ms MatchSet) (*MatchPattern, error) {
+	matchers, err := getMatchers(patterns, ms)
 	if err != nil {
 		return nil, err
 	}
@@ -55,21 +59,43 @@ func (m MatchPattern) MatchesUrl(address *url.URL) (bool, error) {
 	return false, nil
 }
 
-func getMatchers(patterns, protocols []string) ([]matcher, error) {
+func GetDefaultMatchSet() MatchSet {
+	return MatchSet{
+		[]string{"http", "https", "ws", "wss", "ftp", "ftps", "data", "file"},
+		[]string{"http", "https", "ws", "wss"},
+	}
+}
+
+// GetChromeExtensionSchemesas returns the allowed the extension schemes
+// as defined in https://developer.chrome.com/docs/extensions/mv3/match_patterns/
+func GetChromeExtensiontMatchSet() MatchSet {
+	return MatchSet{
+		[]string{"http", "https", "file", "ftp", "urn"},
+		[]string{"http", "https"},
+	}
+}
+
+func getMatchers(patterns []string, ms MatchSet) ([]matcher, error) {
 	result := make([]matcher, len(patterns))
 	var err error
 	for i := 0; i < len(patterns); i++ {
-		if patterns[i] == allURLs {
-			result[i], err = getAllMatcher(patterns[i], protocols)
-			if err != nil {
+		if patterns[i] == allURLPattern {
+			if result[i], err = getSchemeMatcher(patterns[i], ms.allUrlSchemes); err != nil {
 				return result, err
 			}
+		} else if patterns[i] == allPattern {
+			// TODO: may not need a special case
+			if result[i], err = getSchemeMatcher(patterns[i], ms.allowedSchemes); err != nil {
+				return result, err
+			}
+		} else {
+			return result, fmt.Errorf("unknown pattern %s", patterns[i])
 		}
 	}
 	return result, nil
 }
 
-func getAllMatcher(pattern string, schemes []string) (matcher, error) {
+func getSchemeMatcher(pattern string, schemes []string) (matcher, error) {
 	return matcher{
 		allURL,
 		pattern,
