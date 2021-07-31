@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	allURLPattern   = "<all_urls>"
+	// AllURLPattern is a magic pattern, that matches all urls with allowed schemes
+	AllURLPattern   = "<all_urls>"
 	allPattern      = "*://*/*"
 	matchAll        = "*"
 	matchSubdomains = "*."
@@ -42,8 +43,8 @@ type MatchPattern struct {
 	matchers []*matcher
 }
 
-// NewMatchPattern creates new pattern matcher given list of patterns and match set
-func NewMatchPattern(patterns []string, ms MatchSet) (*MatchPattern, error) {
+// New creates new pattern matcher given list of patterns and match set
+func New(patterns []string, ms MatchSet) (*MatchPattern, error) {
 	matchers, err := getMatchers(patterns, ms)
 	if err != nil {
 		return nil, err
@@ -93,7 +94,7 @@ func getMatchers(patterns []string, ms MatchSet) ([]*matcher, error) {
 	result := make([]*matcher, len(patterns))
 	var err error
 	for i := 0; i < len(patterns); i++ {
-		if patterns[i] == allURLPattern {
+		if patterns[i] == AllURLPattern {
 			if result[i], err = getSchemeMatcher(patterns[i], ms.allUrlSchemes); err != nil {
 				return result, err
 			}

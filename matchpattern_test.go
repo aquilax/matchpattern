@@ -91,7 +91,7 @@ func TestMatchPattern_MatchesMDN(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf(" `%s` %s", tt.name, tt.url), func(t *testing.T) {
-			m, err := NewMatchPattern(tt.p, GetDefaultMatchSet())
+			m, err := New(tt.p, GetDefaultMatchSet())
 			if err != nil {
 				t.Fatalf(err.Error())
 			}
@@ -138,7 +138,7 @@ func TestMatchPattern_MatchesChromeExtensions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf(" `%s` %s", tt.name, tt.url), func(t *testing.T) {
-			m, err := NewMatchPattern(tt.p, GetChromeExtensionMatchSet())
+			m, err := New(tt.p, GetChromeExtensionMatchSet())
 			if err != nil {
 				t.Fatalf(err.Error())
 			}
