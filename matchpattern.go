@@ -1,3 +1,5 @@
+// Package matchpattern implements Match patterns validation primarily used in browser extensions
+// as defined in https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
 package matchpattern
 
 import (
@@ -40,6 +42,7 @@ type MatchPattern struct {
 	matchers []*matcher
 }
 
+// NewMatchPattern creates new pattern matcher given list of patterns and match set
 func NewMatchPattern(patterns []string, ms MatchSet) (*MatchPattern, error) {
 	matchers, err := getMatchers(patterns, ms)
 	if err != nil {
@@ -48,6 +51,7 @@ func NewMatchPattern(patterns []string, ms MatchSet) (*MatchPattern, error) {
 	return &MatchPattern{matchers}, nil
 }
 
+// Matches validates the address against the provided patterns and returns true and no error if it matches
 func (mp MatchPattern) Matches(address string) (bool, error) {
 	addressUrl, err := url.Parse(address)
 	if err != nil {
@@ -56,6 +60,7 @@ func (mp MatchPattern) Matches(address string) (bool, error) {
 	return mp.MatchesUrl(addressUrl)
 }
 
+// MatchesUrl validates the url against the provided patterns and returns true and no error if it matches
 func (mp MatchPattern) MatchesUrl(address *url.URL) (bool, error) {
 	for i := 0; i < len(mp.matchers); i++ {
 		matches, err := mp.matchers[i].matcher(address)
