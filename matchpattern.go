@@ -3,7 +3,6 @@ package matchpattern
 import (
 	"fmt"
 	"net/url"
-	"path/filepath"
 	"strings"
 )
 
@@ -197,6 +196,35 @@ func isValidPath(url *url.URL, pathPattern string) (bool, error) {
 		// add the query string
 		path = path + querySeparator + url.RawQuery
 	}
-	// TODO replace me
-	return filepath.Match(pathPattern, path)
+	return isValidPathPattern(pathPattern, path)
+}
+
+func isValidPathPattern(pathPattern, path string) (bool, error) {
+	// TODO: Refactor me
+	segments := strings.Split(pathPattern, matchAll)
+	rem := path
+	if segments[len(segments)-1] != "" {
+		// consume the capping match
+		if !strings.HasSuffix(path, segments[len(segments)-1]) {
+			return false, nil
+		}
+		index := len(path) - len(segments[len(segments)-1])
+		if index == -1 {
+			return false, nil
+		}
+		rem = rem[:index]
+		segments[len(segments)-1] = ""
+	}
+	for i, segment := range segments {
+		if segment == "" && i == len(segments)-1 {
+			// trailing matchall
+			rem = ""
+		}
+		index := strings.Index(rem, segment)
+		if index == -1 {
+			return false, nil
+		}
+		rem = rem[index+len(segment):]
+	}
+	return rem == "", nil
 }
