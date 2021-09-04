@@ -18,7 +18,7 @@ func TestMatchPattern_MatchesMDN(t *testing.T) {
 		{"all_urls", []string{"<all_urls>"}, "ws://sockets.somewhere.org/", true},
 		{"all_urls", []string{"<all_urls>"}, "wss://ws.example.com/stuff/", true},
 		{"all_urls", []string{"<all_urls>"}, "ftp://files.somewhere.org/", true},
-		{"all_urls", []string{"<all_urls>"}, "ftps://files.somewhere.org/", true},
+		{"all_urls", []string{"<all_urls>"}, "ftps://files.somewhere.org/", false},
 		{"all_urls", []string{"<all_urls>"}, "resource://a/b/c/", false},
 
 		{"*://*/*", []string{"*://*/*"}, "http://example.org/", true},

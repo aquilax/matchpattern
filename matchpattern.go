@@ -76,7 +76,7 @@ func (mp MatchPattern) MatchesUrl(address *url.URL) (bool, error) {
 // as defined in https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns
 func GetDefaultMatchSet() MatchSet {
 	return MatchSet{
-		[]string{"http", "https", "ws", "wss", "ftp", "ftps", "data", "file"},
+		[]string{"http", "https", "ws", "wss", "ftp", "data", "file"},
 		[]string{"http", "https", "ws", "wss"},
 	}
 }
